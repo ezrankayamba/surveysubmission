@@ -1,0 +1,27 @@
+<div class="panel panel-default">
+	<table class="form table table-borderless">
+		<caption>
+			Role Details
+		</caption>
+		<tr>
+			<td class="col-sm-2"><label for="username">Name:</label></td>
+			<td class="col-sm-10"><input type="text" ng-model="entity.username" class="form-control"
+				id="name" placeholder="Username" /></td>
+		</tr>
+		<tr>
+			<td><label for="email">Email: </label></td>
+			<td><input type="text" data-ng-model="entity.email" class="form-control" id="email"
+				placeholder="Email" /></td>
+		</tr>
+		<tr>
+			<td><label for="role">Role:</label></td>
+			<td><select data-ng-options="e.name for e in roleOptions track by e.id" class="form-control" id="role"
+				data-ng-model="entity.role">
+			</select></td>
+		</tr>
+		<tr>
+			<td colspan="2" class="bottom-controls"><input type="submit" class="btn btn-primary btn-sm"
+				value="Save" /></td>
+		</tr>
+	</table>
+</div>

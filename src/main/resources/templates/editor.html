@@ -1,0 +1,34 @@
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=5,IE=9" ><![endif]-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<title>Editor</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+<meta name="_csrf_param" th:content="${_csrf.parameterName}" />
+<meta name="orig_filename" th:content="${filename}" />
+<link rel="stylesheet" type="text/css" th:href="@{/editor/styles/grapheditor.css}" />
+<script type="text/javascript" th:src="@{/js/lib/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/Init.js}"></script>
+<script type="text/javascript" th:src="@{/editor/jscolor/jscolor.js}"></script>
+<script type="text/javascript" th:src="@{/editor/sanitizer/sanitizer.min.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/mxClient.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/EditorUi.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/Editor.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/Sidebar.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/Graph.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/Shapes.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/Actions.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/Menus.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/Format.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/Toolbar.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/Dialogs.js}"></script>
+<script type="text/javascript" th:src="@{/editor/js/editor.js}"></script>
+</head>
+<body class="geEditor">
+</body>
+</html>

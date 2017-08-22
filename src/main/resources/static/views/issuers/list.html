@@ -1,0 +1,38 @@
+<div class="panel panel-default">
+	<table class="table table-condensed table-striped table-bordered table-responsive">
+		<caption>
+			<i class="tbl-title">All Issuers</i> <i class="tbl-actions"><a
+				data-ui-sref="entityAdd({p1:'data',p2:'issuers'})" class="btn btn-primary btn-sm">Add New</a></i>
+		</caption>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>API Username</th>
+				<!-- th>API Password</th>
+				<th>A2W Check Name</th>
+				<th>A2W Check Status</th>
+				<th>A2W Send Trxn</th>
+				<th>W2A Callback</th-->
+				<th>White List</th>
+				<th class="col-sm-2 row-actions">Row Actions</th>
+			</tr>
+		</thead>
+		<tr data-ng-repeat="entity in entities">
+			<td class="data-nowrap">{{entity.name}}</td>
+			<td>{{entity.apiUsername}}</td>
+			<!-- td>{{entity.apiPassword}}</td>
+			<td>{{entity.a2wCheckname}}</td>
+			<td>{{entity.a2wCheckStatus}}</td>
+			<td>{{entity.a2wSendTrxn}}</td>
+			<td>{{entity.w2aCallback}}</td-->
+			<td>{{entity.whitelist}}</td>
+			<td class="row-actions">
+				<div class="btn-group">
+					<a class="btn btn-primary btn-xs" ui-sref="entityView({id:entity.id, p1:'data',p2:'issuers'})">View</a>
+					<a class="btn btn-danger btn-xs" ng-click="entityDelete(entity)" confirm-click="">Delete</a>
+				</div>
+			</td>
+		</tr>
+		
+	</table>
+</div>

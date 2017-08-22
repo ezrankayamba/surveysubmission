@@ -1,0 +1,38 @@
+<div class="panel panel-default">
+	<table class="table table-condensed form table-borderless">
+		<caption>
+			Details for <b>{{entity.issuerTrxnId}}</b></select>
+		</caption>
+		<tr>
+			<td class="col-sm-2">Trans ID:</td>
+			<td class="col-sm-10">{{entity.issuerTrxnId}}</td>
+		</tr>
+		<tr>
+			<td class="col-sm-2">Ref Number:</td>
+			<td class="col-sm-10">{{entity.transRefNumber}}</td>
+		</tr>
+		<tr>
+			<td class="col-sm-2">Amount:</td>
+			<td class="col-sm-10">{{entity.amount}}</td>
+		</tr>		
+		<tr>
+			<td class="col-sm-2">MSISDN:</td>
+			<td class="col-sm-10">{{entity.msisdn}}</td>
+		</tr>
+		<tr>
+			<td class="col-sm-2">Service:</td>
+			<td class="col-sm-10">{{entity.service.name}}</td>
+		</tr>
+		<tr>
+			<td class="col-sm-2">Status:</td>
+			<td class="col-sm-10">{{entity.status}}</td>
+		</tr>
+		<tr>
+			<td colspan="2" class="bottom-controls">
+				<div>
+					<a class="btn btn-primary btn-sm" ui-sref="transList">Back to list</a>
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>

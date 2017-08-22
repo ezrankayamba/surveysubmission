@@ -1,0 +1,20 @@
+<div class="panel panel-default">
+	<table class="table table-condensed form table-borderless">
+		<caption>Details for <b>{{entity.name}}</b></caption>
+		<tr>
+			<td class="col-sm-2">Name: </td>
+			<td class="col-sm-10">{{entity.name}}</td>
+		</tr>
+		<tr>
+			<td>Description: </td>
+			<td>{{entity.description}}</td>
+		</tr>
+		<tr>
+			<td colspan="2" class="bottom-controls">
+				<div>
+					<a class="btn btn-primary btn-sm" ui-sref="entityEdit({id:entity.id, p1:'data',p2:'roles'})">Edit</a>
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>
