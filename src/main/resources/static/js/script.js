@@ -21,7 +21,7 @@ $(document).ready(
 			}
 			$('.nav-sidebar .nav li a[data-href="' + frag + '"]').parent()
 					.addClass('active');
-			var style='zoomIn';
+			var style = 'zoomIn';
 			doAnimate(style);
 
 			$(".nav-sidebar .nav li a").on("click", function() {

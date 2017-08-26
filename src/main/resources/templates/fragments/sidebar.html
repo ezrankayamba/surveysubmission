@@ -8,16 +8,10 @@
 			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="userList"
 				data-href="#/data/users">Manage Users</a></li>
 			<li sec:authorize="hasRole('Administrator')" class="nav-divider"></li>
-			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="issuerList"
-				data-href="#/data/issuers">Manage Issuers</a></li>
-			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="partnerList"
-				data-href="#/data/partners">Manage Partners</a></li>
-			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="serviceList"
-				data-href="#/data/services">Manage Services</a></li>
-			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="transList"
-				data-href="#/data/trans">Transactions</a></li>
-			<li class="nav-divider"></li>
-			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="diagramList" data-href="#/data/diagrams">Diagram Repository</a></li>
+			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="projectList"
+				data-href="#/data/projects">Survey Projects</a></li>
+			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="formReposList"
+				data-href="#/data/formrepos">Form Repositories</a></li>
 			<li class="nav-divider"></li>
 			<li>
 				<div class="logout">

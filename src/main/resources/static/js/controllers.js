@@ -66,17 +66,12 @@ angular.module('mfsgwApp.controllers',
 					p2 : 'roles'
 				});
 				$scope.entity.role = $scope.roleOptions[0];
-			} else if (folder === 'services') {
-				$scope.issuerOptions = Entity.query({
+			} else if (folder === 'formrepos') {
+				$scope.projectOptions = Entity.query({
 					p1 : 'data',
-					p2 : 'issuers'
+					p2 : 'projects'
 				});
-				$scope.entity.issuer = $scope.issuerOptions[0];
-				$scope.partnerOptions = Entity.query({
-					p1 : 'data',
-					p2 : 'partners'
-				});
-				$scope.entity.partner = $scope.partnerOptions[0];
+				$scope.entity.project = $scope.projectOptions[0];
 			}
 
 		}).controller('EntityEditController',
@@ -106,14 +101,10 @@ angular.module('mfsgwApp.controllers',
 					p1 : 'data',
 					p2 : 'roles'
 				});
-			} else if (folder === 'services') {
-				$scope.issuerOptions = Entity.query({
+			} else if (folder === 'formrepos') {
+				$scope.projectOptions = Entity.query({
 					p1 : 'data',
-					p2 : 'issuers'
-				});
-				$scope.partnerOptions = Entity.query({
-					p1 : 'data',
-					p2 : 'partners'
+					p2 : 'projects'
 				});
 			}
 			$scope.loadEntity();

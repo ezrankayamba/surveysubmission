@@ -30,17 +30,11 @@ angular.module('mfsgwApp.services', []).factory('Entity', function($resource, Mf
 		case 'users':
 			menu='userList';
 			break;
-		case 'issuers':
-			menu='issuerList';
+		case 'projects':
+			menu='projectList';
 			break;
-		case 'partners':
-			menu='partnerList';
-			break;
-		case 'services':
-			menu='serviceList';
-			break;
-		case 'trans':
-			menu='transList';
+		case 'formrepos':
+			menu='formReposList';
 			break;
 
 		default:menu='roleList';
@@ -65,7 +59,7 @@ angular.module('mfsgwApp.services', []).factory('Entity', function($resource, Mf
 	}
 }]).service('MfsGwUtility', [function($scope, $resource) {
 	this.baseUrl = function (){
-		return 'http://localhost:8080';
+		return '';
 	};
 	this.stdHeaders = function (){
 		var token = $("meta[name='_csrf']").attr("content");

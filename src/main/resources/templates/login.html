@@ -16,21 +16,22 @@
 	<div id="main-wrapper">
 		<article class="site-content">
 			<div id="loginform">
-				<div>
-					<div th:if="${param.error}" class="alert alert-danger loginmessage">Invalid username and
-						password.</div>
-					<div th:if="${param.logout}" class="alert alert-warning loginmessage">You have been
-						logged out.</div>
-				</div>
+				<div th:if="${param.error}" class="alert alert-danger loginmessage">Invalid user name or
+					password.</div>
+				<div th:if="${param.logout}" class="alert alert-warning loginmessage">You have been logged
+					out.</div>
 				<form name="login" th:action="@{/login}" method="post">
 					<fieldset>
 						<legend>Please Login</legend>
-						<label for="username">Username</label> <input type="text" id="username" name="username" /> <label
-							for="password">Password</label> <input type="password" id="password" name="password" />
-						<div class="form-actions">
-							<button id="btnsubmit" type="submit" class="btn btn-primary">
-								Log in <span class="glyphicon glyphicon-log-in"></span>
-							</button>
+						<div class="fields">
+							<label for="username">User name: </label> <input type="text" id="username" name="username" value="" />
+							<br /> <label for="password">Password: </label> <input type="password" id="password"
+								name="password" value=""/>
+							<div class="form-actions">
+								<button id="btnsubmit" type="submit" class="btn btn-primary">
+									Log in <span class="glyphicon glyphicon-log-in"></span>
+								</button>
+							</div>
 						</div>
 					</fieldset>
 				</form>

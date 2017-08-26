@@ -14,6 +14,7 @@ angular.module('mfsgwApp').config(function($stateProvider, $httpProvider) {
 			}
 		},
 		templateUrl : function(stateParams) {
+			console.log(stateParams);
 			return 'views/' + stateParams.p2 + '/view.html'
 		},
 		controller : 'EntityViewController'
@@ -28,6 +29,7 @@ angular.module('mfsgwApp').config(function($stateProvider, $httpProvider) {
 			}
 		},
 		templateUrl : function(stateParams) {
+			console.log(stateParams);
 			return 'views/' + stateParams.p2 + '/add.html'
 		},
 		controller : 'EntityCreateController'
@@ -53,25 +55,13 @@ angular.module('mfsgwApp').config(function($stateProvider, $httpProvider) {
 		url : '/data/users',
 		templateUrl : 'views/users/list.html',
 		controller : 'EntityListController'
-	}).state('issuerList', {
-		url : '/data/issuers',
-		templateUrl : 'views/issuers/list.html',
+	}).state('projectList', {
+		url : '/data/projects',
+		templateUrl : 'views/projects/list.html',
 		controller : 'EntityListController'
-	}).state('partnerList', {
-		url : '/data/partners',
-		templateUrl : 'views/partners/list.html',
-		controller : 'EntityListController'
-	}).state('serviceList', {
-		url : '/data/services',
-		templateUrl : 'views/services/list.html',
-		controller : 'EntityListController'
-	}).state('transList', {
-		url : '/data/trans',
-		templateUrl : 'views/trans/list.html',
-		controller : 'EntityListController'
-	}).state('diagramList', {
-		url : '/data/diagrams',
-		templateUrl : 'views/diagrams/list.html',
+	}).state('formReposList', {
+		url : '/data/formrepos',
+		templateUrl : 'views/formrepos/list.html',
 		controller : 'EntityListController'
 	}).state('home', {
 		url : '/home',
