@@ -1,3 +1,3 @@
-<form class="form-horizontal" role="form" ng-submit="updateEntity({p1:'data',p2:'formrepos'})">
-    <div ng-include="'views/formrepos/_form.html'"></div>
+<form class="form-horizontal" role="form" data-ng-submit="updateEntityMultiPart({p1:'data',p2:'formrepos'})" enctype="multipart/form-data">
+    <div data-ng-include="'views/formrepos/_form.html'"></div>
 </form>

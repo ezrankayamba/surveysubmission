@@ -44,8 +44,8 @@ angular.module('mfsgwApp.controllers',
 
 		}).controller(
 		'EntityCreateController',
-		function($scope, $state, $stateParams, Entity, $http, pathService,
-				$location) {
+		function($scope, $state, $stateParams, Entity, MultipartEntity, $http,
+				pathService, $location) {
 
 			$scope.entity = new Entity();
 			var parts = pathService.getPathParts($location.path());
@@ -57,6 +57,33 @@ angular.module('mfsgwApp.controllers',
 					$state.go(pathService.getSideBarMenu(parts[2]));
 				});
 			}
+
+			$scope.addEntityMultiPart = function() {
+				var form = $scope.entity;
+				var fd = new FormData();
+
+				var data = {};
+
+				$.each(form, function(key, value) {
+					if (key.startsWith('$') || key == 'file') {
+						return;
+					}
+					data[key] = value;
+				});
+
+				var blob = new Blob([ JSON.stringify(data, null, 2) ], {
+					type : 'application/json'
+				});
+				fd.append('entity', blob);
+
+				if (form.file)
+					fd.append('file', form.file);
+
+				MultipartEntity.saveMultiPart("/" + parts[1] + "/" + parts[2],
+						fd, function() {
+							$state.go(pathService.getSideBarMenu(parts[2]));
+						});
+			};
 
 			/* Select options */
 			var folder = parts[2] ? parts[2] : 'roles';
@@ -74,14 +101,43 @@ angular.module('mfsgwApp.controllers',
 				$scope.entity.project = $scope.projectOptions[0];
 			}
 
-		}).controller('EntityEditController',
-		function($scope, $state, $stateParams, Entity, pathService, $location) {
+		}).controller(
+		'EntityEditController',
+		function($scope, $state, $stateParams, Entity, MultipartEntity,
+				pathService, $location, $http) {
 			var parts = pathService.getPathParts($location.path());
 			$scope.updateEntity = function() {
 				$scope.entity.$update({
 					p1 : parts[1],
 					p2 : parts[2]
 				}, function() {
+					$state.go(pathService.getSideBarMenu(parts[2]));
+				});
+			};
+
+			$scope.updateEntityMultiPart = function() {
+				var form = $scope.entity;
+				var fd = new FormData();
+
+				var data = {};
+
+				$.each(form, function(key, value) {
+					if (key.startsWith('$') || key == 'file') {
+						return;
+					}
+					data[key] = value;
+				});
+
+				var blob = new Blob([ JSON.stringify(data, null, 2) ], {
+					type : 'application/json'
+				});
+				fd.append('entity', blob);
+
+				if (form.file)
+					fd.append('file', form.file);
+
+				MultipartEntity.updateMultiPart("/" + parts[1] + "/" + parts[2]
+						+ "/" + parts[3], fd, function() {
 					$state.go(pathService.getSideBarMenu(parts[2]));
 				});
 			};

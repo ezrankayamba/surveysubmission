@@ -59,6 +59,10 @@ angular.module('mfsgwApp').config(function($stateProvider, $httpProvider) {
 		url : '/data/projects',
 		templateUrl : 'views/projects/list.html',
 		controller : 'EntityListController'
+	}).state('formList', {
+		url : '/data/forms',
+		templateUrl : 'views/forms/list.html',
+		controller : 'EntityListController'
 	}).state('formReposList', {
 		url : '/data/formrepos',
 		templateUrl : 'views/formrepos/list.html',
@@ -69,6 +73,20 @@ angular.module('mfsgwApp').config(function($stateProvider, $httpProvider) {
 		controller : 'HomeController'
 	});
 }).run(function($state, $trace, $rootScope, pathService, $location) {
-	//$trace.enable("TRANSITION", "VIEWCONFIG");
+	// $trace.enable("TRANSITION", "VIEWCONFIG");
 	$location.path("home");
-});
+}).directive('fileModel', [ '$parse', function($parse) {
+	return {
+		restrict : 'A',
+		link : function(scope, element, attrs) {
+			var model = $parse(attrs.fileModel);
+			var modelSetter = model.assign;
+
+			element.bind('change', function() {
+				scope.$apply(function() {
+					modelSetter(scope, element[0].files[0]);
+				});
+			});
+		}
+	};
+} ]);

@@ -1,15 +1,51 @@
-angular.module('mfsgwApp.services', []).factory('Entity', function($resource, MfsGwUtility) {
+angular.module('mfsgwApp.services', []).factory('Entity', function($rootScope, $resource, MfsGwUtility) {
 	return $resource(MfsGwUtility.baseUrl()+'/:p1/:p2/:id', {
 		id : '@id',
 		p1: '@p1',
 		p2: '@p2'
 	}, MfsGwUtility.stdHeaders());
 	
+}).factory('MultipartEntity', function($rootScope, $resource, MfsGwUtility, $http) {
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
+	var headerkv = {};
+	headerkv[header] = token;
+	headerkv['Content-Type']=undefined;
+	return {
+		updateMultiPart: function(url, data, callback){
+			var request = $http({
+				method: "PUT",
+				url: url,
+				data: data,
+				transformRequest: angular.identity,
+				headers: headerkv
+			});
+			
+			request.then(function(response){
+				callback(response);
+			});
+		},
+		saveMultiPart: function(url, data, callback){
+			var request = $http({
+				method: "POST",
+				url: url,
+				data: data,
+				transformRequest: angular.identity,
+				headers: headerkv
+			});
+			
+			request.then(function(response){
+				callback(response);
+			});
+		}
+	}
+	
 }).service('popupService', [function($scope, $confirm) {
 	this.showPopup = function(action, message) {
 		return $window.confirm(message);
 	}
 }]).service('pathService', [function($scope) {
+	
 	this.getPathParts = function(myPath) {
 		var parts = ['', 'data', 'roles' ];
 		try {
@@ -20,7 +56,7 @@ angular.module('mfsgwApp.services', []).factory('Entity', function($resource, Mf
 			console.log(e);
 		}
 		return parts;
-	}
+	};
 	this.getSideBarMenu = function(e){
 		var menu='';
 		switch (e) {
@@ -42,7 +78,7 @@ angular.module('mfsgwApp.services', []).factory('Entity', function($resource, Mf
 		}
 		
 		return menu;
-	}
+	};
 	this.getSideBarMenuExt = function(parts){
 		var menu='';
 		if(parts[3] === 'new'){
@@ -56,8 +92,9 @@ angular.module('mfsgwApp.services', []).factory('Entity', function($resource, Mf
 			console.log(parts);
 		}
 		return menu;
-	}
-}]).service('MfsGwUtility', [function($scope, $resource) {
+	};
+}]).service('MfsGwUtility', [function($scope, $resource, $location) {
+	
 	this.baseUrl = function (){
 		return '';
 	};
@@ -66,6 +103,7 @@ angular.module('mfsgwApp.services', []).factory('Entity', function($resource, Mf
 		var header = $("meta[name='_csrf_header']").attr("content");
 		var headerkv = {};
 		headerkv[header] = token;
+		
 		var globalHeaders =  {
 				update : {
 					method : 'PUT',
@@ -78,6 +116,11 @@ angular.module('mfsgwApp.services', []).factory('Entity', function($resource, Mf
 				save : {
 					method : 'POST',
 					headers : headerkv
+				},
+				saveMultiPart : {
+					method: "POST",
+		            transformRequest: angular.identity,
+		            headers: { 'Content-Type': undefined }
 				}
 			};
 		

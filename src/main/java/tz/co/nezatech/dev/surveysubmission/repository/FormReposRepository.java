@@ -10,6 +10,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import com.mysql.jdbc.Statement;
+
 import tz.co.nezatech.dev.surveysubmission.model.FormRepos;
 import tz.co.nezatech.dev.surveysubmission.model.Project;
 
@@ -50,7 +52,8 @@ public class FormReposRepository extends BaseDataRepository<FormRepos> {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement(
-					"insert into tbl_form_repository(name, description,filepath, project_id) values (?,?,?,?)");
+					"insert into tbl_form_repository(name, description,filepath, project_id) values (?,?,?,?)",
+					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, entity.getName());
 			ps.setString(2, entity.getDescription());
 			ps.setString(3, entity.getFilepath());
@@ -67,7 +70,7 @@ public class FormReposRepository extends BaseDataRepository<FormRepos> {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement(
-					"update tbl_form_repository set name=?,  description=?, filepath=?, project_id where id=?");
+					"update tbl_form_repository set name=?,  description=?, filepath=?, project_id=? where id=?");
 			ps.setString(1, entity.getName());
 			ps.setString(2, entity.getDescription());
 			ps.setString(3, entity.getFilepath());

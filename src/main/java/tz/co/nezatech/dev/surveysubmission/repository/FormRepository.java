@@ -42,7 +42,7 @@ public class FormRepository extends BaseDataRepository<Form> {
 	public String sqlFindAll() {
 		return "select fm.*, fr.name as repos_name, "
 				+ "fr.description as repos_description, fr.filepath as repos_filepath, fr.project_id, "
-				+ "pr.name as proj_name, pr.status as proj_status," + " u.username, u.email " + "from tbl_form_data fm "
+				+ "pr.name as proj_name, pr.status as proj_status," + " u.username, u.email " + "from tbl_form fm "
 				+ "left join tbl_form_repository fr on fm.repository_id=fr.id "
 				+ "left join tbl_project pr on fr.project_id=pr.id " + "left join tbl_user u on fm.user_id=u.id ";
 	}

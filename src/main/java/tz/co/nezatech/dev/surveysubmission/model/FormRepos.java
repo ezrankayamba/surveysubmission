@@ -57,4 +57,10 @@ public class FormRepos extends BaseData {
 		this.project = project;
 	}
 
+	@Override
+	public String toString() {
+		return "FormRepos [id=" + id + ", name=" + name + ", description=" + description + ", filepath=" + filepath
+				+ ", project=" + project + "]";
+	}
+
 }

@@ -22,7 +22,7 @@ public class FormController {
 	@Autowired
 	FormRepository formRepository;
 
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	public List<Form> get(ModelAndView mv) {
 		return this.formRepository.getAll();
 	}
@@ -32,7 +32,7 @@ public class FormController {
 		return this.formRepository.findById(id);
 	}
 
-	@RequestMapping(value = "/", method = RequestMethod.POST)
+	@RequestMapping(value = "", method = RequestMethod.POST)
 	public Status usersPost(@RequestBody Form entity, ModelAndView mv) {
 		return this.formRepository.create(entity);
 	}
