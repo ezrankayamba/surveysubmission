@@ -14,6 +14,8 @@ public interface IDataRepository<T extends Object> {
 
 	public List<T> getAll();
 
+	public List<T> getAll(String column, Object value);
+
 	public Status create(final T entity);
 
 	public T findById(int id);
@@ -41,4 +43,8 @@ public interface IDataRepository<T extends Object> {
 	public T schema();
 
 	public boolean updateOnDuplicate();
+
+	public Status onSave(T entity, Status status);
+
+	public List<T> onList(List<T> list);
 }

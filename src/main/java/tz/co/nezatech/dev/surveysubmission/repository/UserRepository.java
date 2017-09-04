@@ -4,19 +4,28 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import tz.co.nezatech.dev.surveysubmission.model.Role;
+import tz.co.nezatech.dev.surveysubmission.model.Status;
 import tz.co.nezatech.dev.surveysubmission.model.User;
 
 @Repository
 public class UserRepository extends BaseDataRepository<User> {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+	@Autowired
+	ProjectRepository projectRepository;
 
 	@Override
 	public RowMapper<User> getRowMapper() {
@@ -46,7 +55,9 @@ public class UserRepository extends BaseDataRepository<User> {
 	public PreparedStatement psCreate(User entity, Connection conn) {
 		PreparedStatement ps = null;
 		try {
-			ps = conn.prepareStatement("insert into tbl_user(username, password,email, role_id, enabled) values (?,?,?,?, ?)");
+			ps = conn.prepareStatement(
+					"insert into tbl_user(username, password,email, role_id, enabled) values (?,?,?,?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, entity.getUsername());
 			ps.setString(2, entity.getPassword());
 			ps.setString(3, entity.getEmail());
@@ -91,5 +102,68 @@ public class UserRepository extends BaseDataRepository<User> {
 	@Override
 	public JdbcTemplate getJdbcTemplate() {
 		return this.jdbcTemplate;
+	}
+
+	@Override
+	public Status onSave(final User entity, Status status) {
+		if (status.getGeneratedId() > 0)
+			entity.setId(status.getGeneratedId());
+		System.out.println("Updated user successfully: " + entity.getId() + " Projects? " + entity.getProjects());
+		getJdbcTemplate().update(new PreparedStatementCreator() {
+
+			@Override
+			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+				PreparedStatement ps = null;
+				try {
+					ps = conn.prepareStatement("delete from tbl_user_project where user_id=?");
+					ps.setInt(1, entity.getId());
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+				return ps;
+			}
+		});
+		String sql = "insert into tbl_user_project (user_id, project_id) values (?,?)";
+		if (!entity.getProjects().isEmpty()) {
+
+			getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
+
+				@Override
+				public void setValues(PreparedStatement ps, int index) throws SQLException {
+					int userId = entity.getId();
+					int projectId = entity.getProjects().get(index).getId();
+					System.out.println(
+							String.format("Record user project(UserId: %d, ProjectId: %d)", userId, projectId));
+					ps.setInt(1, userId);
+					ps.setInt(2, projectId);
+
+				}
+
+				@Override
+				public int getBatchSize() {
+					return entity.getProjects().size();
+				}
+			});
+		}
+		return status;
+	}
+
+	@Override
+	public List<User> onList(List<User> list) {
+		if (list != null && !list.isEmpty()) {
+			for (Iterator<User> iterator = list.iterator(); iterator.hasNext();) {
+				final User user = (User) iterator.next();
+				getJdbcTemplate().query("select * from tbl_user_project where user_id=" + user.getId(),
+						new RowCallbackHandler() {
+
+							@Override
+							public void processRow(ResultSet rs) throws SQLException {
+								user.getProjects().add(projectRepository.findById(rs.getInt("project_id")));
+							}
+						});
+			}
+		}
+		return list;
 	}
 }

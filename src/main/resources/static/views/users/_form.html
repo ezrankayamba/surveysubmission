@@ -1,12 +1,10 @@
 <div class="panel panel-default">
 	<table class="form table table-borderless">
-		<caption>
-			Role Details
-		</caption>
+		<caption>Role Details</caption>
 		<tr>
 			<td class="col-sm-2"><label for="username">Name:</label></td>
-			<td class="col-sm-10"><input type="text" data-ng-model="entity.username" class="form-control"
-				id="name" placeholder="Username" /></td>
+			<td class="col-sm-10"><input type="text" data-ng-model="entity.username"
+				class="form-control" id="name" placeholder="Username" /></td>
 		</tr>
 		<tr>
 			<td><label for="email">Email: </label></td>
@@ -15,9 +13,20 @@
 		</tr>
 		<tr>
 			<td><label for="role">Role:</label></td>
-			<td><select data-ng-options="e.name for e in roleOptions track by e.id" class="form-control" id="role"
-				data-ng-model="entity.role">
+			<td><select data-ng-options="e.name for e in roleOptions track by e.id" class="form-control"
+				id="role" data-ng-model="entity.role">
 			</select></td>
+		</tr>
+		<tr>
+			<td><label for="projects">Projects:</label></td>
+			<td><label class="checklist" data-ng-repeat="project in projects"> <input type="checkbox"
+					data-checklist-model="entity.projects" data-checklist-value="project"> {{project.name}}
+			</label>
+			<div class="checklist-controls">
+				<button type="button" data-ng-click="checkAll()">Check all</button>
+				<button type="button" data-ng-click="uncheckAll()">Uncheck all</button>
+			</div>
+			</td>
 		</tr>
 		<tr>
 			<td colspan="2" class="bottom-controls"><input type="submit" class="btn btn-primary btn-sm"

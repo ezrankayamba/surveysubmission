@@ -157,11 +157,10 @@ CREATE INDEX `fk_tbl_form_data_tbl_form1_idx` ON `survey`.`tbl_form_data` (`form
 --DROP TABLE IF EXISTS `survey`.`tbl_user_project` ;
 
 CREATE TABLE IF NOT EXISTS `survey`.`tbl_user_project` (
-  `id` INT NOT NULL AUTO_INCREMENT,
   `last_update` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user_id` INT NOT NULL,
   `project_id` INT NOT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`user_id`, `project_id`),
   CONSTRAINT `fk_tbl_user_project_tbl_user1`
     FOREIGN KEY (`user_id`)
     REFERENCES `survey`.`tbl_user` (`id`)

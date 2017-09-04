@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import tz.co.nezatech.dev.surveysubmission.model.Form;
 import tz.co.nezatech.dev.surveysubmission.model.FormRepos;
 import tz.co.nezatech.dev.surveysubmission.model.Project;
+import tz.co.nezatech.dev.surveysubmission.model.Status;
 import tz.co.nezatech.dev.surveysubmission.model.User;
 
 @Repository
@@ -61,7 +63,8 @@ public class FormRepository extends BaseDataRepository<Form> {
 	public PreparedStatement psCreate(Form entity, Connection conn) {
 		PreparedStatement ps = null;
 		try {
-			ps = conn.prepareStatement("insert into tbl_form(name, repository_id,user_id) values (?,?,?)");
+			ps = conn.prepareStatement("insert into tbl_form(name, repository_id,user_id) values (?,?,?)",
+					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, entity.getName());
 			ps.setInt(2, entity.getFormRepos().getId());
 			ps.setInt(3, entity.getCapturedBy().getId());
@@ -104,5 +107,11 @@ public class FormRepository extends BaseDataRepository<Form> {
 	@Override
 	public JdbcTemplate getJdbcTemplate() {
 		return this.jdbcTemplate;
+	}
+
+	@Override
+	public Status onSave(Form entity, Status status) {
+		// TODO Auto-generated method stub
+		return status;
 	}
 }

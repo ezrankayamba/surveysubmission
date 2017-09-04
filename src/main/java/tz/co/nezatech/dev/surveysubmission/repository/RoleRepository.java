@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,6 +12,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import tz.co.nezatech.dev.surveysubmission.model.Role;
+import tz.co.nezatech.dev.surveysubmission.model.Status;
 
 @Repository
 public class RoleRepository extends BaseDataRepository<Role> {
@@ -44,7 +46,8 @@ public class RoleRepository extends BaseDataRepository<Role> {
 	public PreparedStatement psCreate(Role entity, Connection conn) {
 		PreparedStatement ps = null;
 		try {
-			ps = conn.prepareStatement("insert into tbl_role(name, description) values (?,?)");
+			ps = conn.prepareStatement("insert into tbl_role(name, description) values (?,?)",
+					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, entity.getName());
 			ps.setString(2, entity.getDescription());
 		} catch (SQLException e) {
@@ -86,5 +89,11 @@ public class RoleRepository extends BaseDataRepository<Role> {
 	@Override
 	public JdbcTemplate getJdbcTemplate() {
 		return this.jdbcTemplate;
+	}
+
+	@Override
+	public Status onSave(Role entity, Status status) {
+		// TODO Auto-generated method stub
+		return status;
 	}
 }

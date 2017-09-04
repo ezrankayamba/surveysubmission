@@ -17,11 +17,17 @@ import tz.co.nezatech.dev.surveysubmission.model.Status;
 public abstract class BaseDataRepository<T extends Object> implements IDataRepository<T> {
 	@Override
 	public List<T> getAll() {
-		return getJdbcTemplate().query(sqlFindAll(), getRowMapper());
+		return onList(getJdbcTemplate().query(sqlFindAll(), getRowMapper()));
+	}
+
+	@Override
+	public List<T> getAll(String column, Object value) {
+		return onList(getJdbcTemplate().query(sqlFindAll() + " where " + column + "='" + value + "'", getRowMapper()));
 	}
 
 	@Override
 	public Status create(final T entity) {
+		Status status = null;
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();
 			int res = getJdbcTemplate().update(new PreparedStatementCreator() {
@@ -31,7 +37,8 @@ public abstract class BaseDataRepository<T extends Object> implements IDataRepos
 					return psCreate(entity, conn);
 				}
 			}, keyHolder);
-			return res == 1 ? new Status(200, "Successfully created enity " + entity, keyHolder.getKey().intValue())
+			int generatedId = keyHolder.getKey().intValue();
+			status = res == 1 ? new Status(200, "Successfully created enity " + entity, generatedId)
 					: new Status(500, "Failed to creat role " + entity + ". Error msg: No role created");
 		} catch (DataAccessException e) {
 			if (e.getMessage().contains("Duplicate entry") && updateOnDuplicate()) {
@@ -41,11 +48,17 @@ public abstract class BaseDataRepository<T extends Object> implements IDataRepos
 				return new Status(500, "Failed to creat role " + entity + ". Error msg: " + e.getMessage());
 			}
 		}
+
+		if (status.getCode() == 200) {
+			return onSave(entity, status);
+		} else {
+			return status;
+		}
 	}
 
 	@Override
 	public T findById(int id) {
-		List<T> entities = getJdbcTemplate().query(sqlFindById(), new Object[] { id }, getRowMapper());
+		List<T> entities = onList(getJdbcTemplate().query(sqlFindById(), new Object[] { id }, getRowMapper()));
 		if (entities != null && !entities.isEmpty()) {
 			return entities.get(0);
 		}
@@ -54,6 +67,7 @@ public abstract class BaseDataRepository<T extends Object> implements IDataRepos
 
 	@Override
 	public Status update(Integer id, T entity) {
+		Status status = null;
 		try {
 			int res = getJdbcTemplate().update(new PreparedStatementCreator() {
 
@@ -62,16 +76,23 @@ public abstract class BaseDataRepository<T extends Object> implements IDataRepos
 					return psUpdate(entity, conn);
 				}
 			});
-			return res == 1 ? new Status(200, "Successfully updated entity " + entity)
+			status = res == 1 ? new Status(200, "Successfully updated entity " + entity)
 					: new Status(500, "Failed to update role " + entity + ". Error msg: No role created");
 		} catch (DataAccessException e) {
 			e.printStackTrace();
 			return new Status(500, "Failed to update entity " + entity + ". Error msg: " + e.getMessage());
 		}
+
+		if (status.getCode() == 200) {
+			return onSave(entity, status);
+		} else {
+			return status;
+		}
 	}
 
 	@Override
 	public Status update(T entity) {
+		Status status = null;
 		try {
 			int res = getJdbcTemplate().update(new PreparedStatementCreator() {
 
@@ -80,11 +101,17 @@ public abstract class BaseDataRepository<T extends Object> implements IDataRepos
 					return psUpdateByKey(entity, conn);
 				}
 			});
-			return res == 1 ? new Status(200, "Successfully updated entity " + entity)
+			status = res == 1 ? new Status(200, "Successfully updated entity " + entity)
 					: new Status(500, "Failed to update role " + entity + ". Error msg: No role created");
 		} catch (DataAccessException e) {
 			e.printStackTrace();
 			return new Status(500, "Failed to update entity " + entity + ". Error msg: " + e.getMessage());
+		}
+
+		if (status.getCode() == 200) {
+			return onSave(entity, status);
+		} else {
+			return status;
 		}
 	}
 
@@ -131,5 +158,10 @@ public abstract class BaseDataRepository<T extends Object> implements IDataRepos
 	@Override
 	public boolean updateOnDuplicate() {
 		return false;
+	}
+
+	@Override
+	public List<T> onList(List<T> list) {
+		return list;
 	}
 }

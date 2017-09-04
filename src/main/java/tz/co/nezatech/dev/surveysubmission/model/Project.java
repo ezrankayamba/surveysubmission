@@ -1,19 +1,31 @@
 package tz.co.nezatech.dev.surveysubmission.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Project extends BaseData {
 	private int id;
 	private String name, status;
-	
+	private List<FormRepos> repos;
 
 	public Project() {
 		super();
+		repos = new LinkedList<>();
 	}
 
 	public Project(int id, String name, String status) {
-		super();
-		this.id=id;
+		this();
+		this.id = id;
 		this.name = name;
 		this.status = status;
+	}
+
+	public List<FormRepos> getRepos() {
+		return repos;
+	}
+
+	public void setRepos(List<FormRepos> repos) {
+		this.repos = repos;
 	}
 
 	public int getId() {

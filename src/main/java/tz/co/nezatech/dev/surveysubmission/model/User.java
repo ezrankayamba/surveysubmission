@@ -1,23 +1,36 @@
 package tz.co.nezatech.dev.surveysubmission.model;
 
-public class User extends BaseData{
+import java.util.LinkedList;
+import java.util.List;
+
+public class User extends BaseData {
 	private int id;
 	private String username;
 	private String password;
 	private String email;
 	private Role role;
 	private boolean enabled;
+	private List<Project> projects;
 
 	public User() {
 		super();
+		projects = new LinkedList<Project>();
 	}
 
 	public User(String username, String password, String email, Role role) {
-		super();
+		this();
 		this.username = username;
 		this.password = password;
 		this.email = email;
 		this.role = role;
+	}
+
+	public List<Project> getProjects() {
+		return projects;
+	}
+
+	public void setProjects(List<Project> projects) {
+		this.projects = projects;
 	}
 
 	public Role getRole() {

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,6 +15,7 @@ import tz.co.nezatech.dev.surveysubmission.model.Form;
 import tz.co.nezatech.dev.surveysubmission.model.FormData;
 import tz.co.nezatech.dev.surveysubmission.model.FormRepos;
 import tz.co.nezatech.dev.surveysubmission.model.Project;
+import tz.co.nezatech.dev.surveysubmission.model.Status;
 import tz.co.nezatech.dev.surveysubmission.model.User;
 
 @Repository
@@ -67,7 +69,8 @@ public class FormDataRepository extends BaseDataRepository<FormData> {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement(
-					"insert into tbl_form_data(metadata, rawvalue,form_id, datatype) values (?,?,?,?)");
+					"insert into tbl_form_data(metadata, rawvalue,form_id, datatype) values (?,?,?,?)",
+					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, entity.getMetadata());
 			ps.setString(2, entity.getRawdata());
 			ps.setInt(3, entity.getForm().getId());
@@ -112,5 +115,11 @@ public class FormDataRepository extends BaseDataRepository<FormData> {
 	@Override
 	public JdbcTemplate getJdbcTemplate() {
 		return this.jdbcTemplate;
+	}
+
+	@Override
+	public Status onSave(FormData entity, Status status) {
+		// TODO Auto-generated method stub
+		return status;
 	}
 }

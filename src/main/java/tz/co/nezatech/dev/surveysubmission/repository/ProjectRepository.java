@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,11 +14,14 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import tz.co.nezatech.dev.surveysubmission.model.Project;
+import tz.co.nezatech.dev.surveysubmission.model.Status;
 
 @Repository
 public class ProjectRepository extends BaseDataRepository<Project> {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+	@Autowired
+	FormReposRepository formReposRepository;
 
 	@Override
 	public RowMapper<Project> getRowMapper() {
@@ -44,8 +50,8 @@ public class ProjectRepository extends BaseDataRepository<Project> {
 	public PreparedStatement psCreate(Project entity, Connection conn) {
 		PreparedStatement ps = null;
 		try {
-			ps = conn.prepareStatement(
-					"insert into tbl_project(name, status) values (?,?)");
+			ps = conn.prepareStatement("insert into tbl_project(name, status) values (?,?)",
+					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, entity.getName());
 			ps.setString(2, entity.getStatus());
 		} catch (SQLException e) {
@@ -86,5 +92,22 @@ public class ProjectRepository extends BaseDataRepository<Project> {
 	@Override
 	public JdbcTemplate getJdbcTemplate() {
 		return this.jdbcTemplate;
+	}
+
+	@Override
+	public Status onSave(Project entity, Status status) {
+		// TODO Auto-generated method stub
+		return status;
+	}
+
+	@Override
+	public List<Project> onList(List<Project> list) {
+		if (list != null && !list.isEmpty()) {
+			for (Iterator<Project> iterator = list.iterator(); iterator.hasNext();) {
+				final Project project = (Project) iterator.next();
+				project.getRepos().addAll(formReposRepository.getAll("project_id", project.getId()));
+			}
+		}
+		return list;
 	}
 }

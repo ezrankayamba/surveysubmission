@@ -373,9 +373,17 @@ td.bottom-controls {
 	min-width: 5em;
 }
 
-/
-* Bpmn anvas
 div#canvas {
 	height: 600px;
 	width: 800px;
 }
+
+/* Checklist Angular */
+label.checklist {
+	display: block;
+}
+div.checklist-controls{
+	padding-top: 10px;
+}
+
+
