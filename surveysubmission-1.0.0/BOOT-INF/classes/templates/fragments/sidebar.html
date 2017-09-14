@@ -1,0 +1,30 @@
+<div style="clear: both;" class="sidebar" th:fragment="sidebar">
+	<nav class="nav-sidebar">
+		<ul class="nav">
+			<li sec:authorize="isAuthenticated()"><a data-ui-sref="home" data-href="#/home">Home</a></li>
+			<li sec:authorize="hasRole('Administrator')" class="nav-divider"></li>
+			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="roleList"
+				data-href="#/data/roles">Manage Roles</a></li>
+			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="userList"
+				data-href="#/data/users">Manage Users</a></li>
+			<li sec:authorize="hasRole('Administrator')" class="nav-divider"></li>
+			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="projectList"
+				data-href="#/data/projects">Survey Projects</a></li>
+			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="formReposList"
+				data-href="#/data/formrepos">Form Repositories</a></li>
+			<li sec:authorize="hasRole('Administrator')"><a data-ui-sref="formList"
+				data-href="#/data/forms">Submitted Forms</a></li>
+			<li class="nav-divider"></li>
+			<li>
+				<div class="logout">
+					<form action="/logout" method="post">
+						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+						<button type="submit">
+							Logout <span class="glyphicon glyphicon-log-out"></span>
+						</button>
+					</form>
+				</div>
+			</li>
+		</ul>
+	</nav>
+</div>

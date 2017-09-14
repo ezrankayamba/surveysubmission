@@ -1,14 +1,18 @@
 package tz.co.nezatech.dev.surveysubmission.controller.api;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +33,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import tz.co.nezatech.dev.surveysubmission.model.Form;
 import tz.co.nezatech.dev.surveysubmission.model.FormRepos;
+import tz.co.nezatech.dev.surveysubmission.model.Status;
 import tz.co.nezatech.dev.surveysubmission.model.User;
+import tz.co.nezatech.dev.surveysubmission.repository.FormDataRepository;
 import tz.co.nezatech.dev.surveysubmission.repository.FormReposRepository;
+import tz.co.nezatech.dev.surveysubmission.repository.FormRepository;
 import tz.co.nezatech.dev.surveysubmission.repository.ProjectRepository;
 import tz.co.nezatech.dev.surveysubmission.repository.UserRepository;
 import tz.co.nezatech.dev.surveysubmission.storage.StorageService;
@@ -59,25 +67,48 @@ public class SurveyApiController {
 	ProjectRepository projectRepository;
 	@Autowired
 	UserRepository userRepository;
+	@Autowired
+	FormRepository formRepository;
+	@Autowired
+	FormDataRepository formDataRepository;
 
 	private final Logger LOG = LoggerFactory.getLogger(SurveyApiController.class);
 
-	@RequestMapping(value = "/form", method = RequestMethod.POST)
-	public @ResponseBody ApiResponse post(MultipartHttpServletRequest request) {
+	@RequestMapping(value = "/form/{id}", method = RequestMethod.POST)
+	public @ResponseBody ApiResponse post(@PathVariable("id") int id, @AuthenticationPrincipal UserDetails user,
+			MultipartHttpServletRequest request) {
 		long contentLength = request.getContentLength();
 		LOG.debug("Content-length: " + contentLength);
 
+		User capturedBy = userRepository.getAll("username", user.getUsername()).get(0);
+
 		try {
 
-			LOG.debug(request.getParameter("name"));
-			LOG.debug(request.getCharacterEncoding());
-			LOG.debug(request.getAttributeNames().nextElement());
+			String formIdStr = request.getParameter("form_id");
+			String formNameStr = request.getParameter("form_name");
+			String reposIdStr = request.getParameter("repository_id");
+
+			LOG.debug(String.format("FormId: %s, FormName: %s, ReposId: %s", formIdStr, formNameStr, reposIdStr));
+			Form form = new Form(formNameStr, reposRepository.findById(Integer.parseInt(reposIdStr)), capturedBy);
+			Status fStatus = formRepository.create(form);
+			String[] excludes = { "form_id", "form_name", "repository_id" };
+			form = formRepository.findById(fStatus.getGeneratedId());
+
+			String formFolder = String.format("%08d/", capturedBy.getId()) + String.format("%05d/", form.getId());
+			LOG.debug(String.format("Form folder: %s", formFolder));
 
 			Collection<Part> parts = request.getParts();
 			for (Iterator<Part> iterator = parts.iterator(); iterator.hasNext();) {
+
 				Part part = (Part) iterator.next();
+
 				String contentType = part.getContentType();
 				String name = part.getName();
+
+				if (Arrays.asList(excludes).contains(name)) {
+					continue;
+				}
+
 				long size = part.getSize();
 				LOG.debug(String.format("Type: %s, Name: %s, Size: %d", contentType, name, size));
 
@@ -94,20 +125,31 @@ public class SurveyApiController {
 						file.getOriginalFilename()));
 
 				String filePath;
+				String fileName = file.getOriginalFilename();
 				if (file.getContentType().contains("video")) {
-					filePath = videos + file.getOriginalFilename();
+					filePath = videos;
 				} else if (file.getContentType().contains("image")) {
-					filePath = pictures + file.getOriginalFilename();
+					filePath = pictures;
 				} else {
-					filePath = others + file.getOriginalFilename();
+					filePath = others;
+				}
+				Path tmp = Paths.get(uploadPath + formFolder + filePath);
+				if (!Files.exists(tmp)) {
+					try {
+						Files.createDirectories(tmp);
+						Path path = Paths.get(uploadPath + formFolder + filePath + fileName);
+						Files.write(path, bytes);
+					} catch (IOException e) {
+						e.printStackTrace();
+						LOG.debug(String.format("Exception: %s", e));
+					}
 				}
 
-				Path path = Paths.get(uploadPath + filePath);
-				Files.write(path, bytes);
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			LOG.debug(String.format("Exception: %s", e));
 		}
 
 		ApiResponse response = new ApiResponse();
@@ -127,7 +169,6 @@ public class SurveyApiController {
 		response.setMessage("Successfully received");
 		response.setStatus("200");
 		response.setData(u.getProjects());
-		
 
 		return response;
 	}

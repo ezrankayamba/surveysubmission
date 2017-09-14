@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Please Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/lib/bootstrap.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/lib/bootstrap-theme.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+<script type="text/javascript" th:src="@{/js/lib/jquery.min.js}"
+	src="../static/js/lib/jquery.min.js"></script>
+<script type="text/javascript" th:src="@{/js/lib/bootstrap.min.js}"
+	src="../static/js/lib/bootstrap.min.js"></script>
+</head>
+<body class="site">
+	<div class="site-content"></div>
+	<div id="main-wrapper">
+		<article class="site-content">
+			<div id="loginform">
+				<div th:if="${param.error}" class="alert alert-danger loginmessage">Invalid user name or
+					password.</div>
+				<div th:if="${param.logout}" class="alert alert-warning loginmessage">You have been logged
+					out.</div>
+				<form name="login" th:action="@{/login}" method="post">
+					<fieldset>
+						<legend>Please Login</legend>
+						<div class="fields">
+							<label for="username">User name: </label> <input type="text" id="username" name="username" value="" />
+							<br /> <label for="password">Password: </label> <input type="password" id="password"
+								name="password" value=""/>
+							<div class="form-actions">
+								<button id="btnsubmit" type="submit" class="btn btn-primary">
+									Log in <span class="glyphicon glyphicon-log-in"></span>
+								</button>
+							</div>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+		</article>
+		<div th:replace="fragments/footer :: footer"></div>
+	</div>
+</body>
+</html>

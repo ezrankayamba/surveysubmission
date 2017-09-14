@@ -1,0 +1,26 @@
+<div class="panel panel-default">
+	<table class="table table-condensed table-striped table-bordered table-responsive">
+		<caption>
+			<i class="tbl-title">All Projects</i> <i class="tbl-actions"><a
+				data-ui-sref="entityAdd({p1:'data',p2:'projects'})" class="btn btn-primary btn-sm">Add New</a></i>
+		</caption>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Status</th>
+				<th class="col-sm-2 row-actions">Row Actions</th>
+			</tr>
+		</thead>
+		<tr data-ng-repeat="entity in entities">
+			<td class="data-nowrap">{{entity.name}}</td>
+			<td>{{entity.status}}</td>
+			<td class="row-actions">
+				<div class="btn-group">
+					<a class="btn btn-primary btn-xs" ui-sref="entityView({id:entity.id, p1:'data',p2:'projects'})">View</a>
+					<a class="btn btn-danger btn-xs" ng-click="entityDelete(entity)" confirm-click="">Delete</a>
+				</div>
+			</td>
+		</tr>
+		
+	</table>
+</div>
