@@ -1,16 +1,22 @@
 package tz.co.nezatech.dev.surveysubmission.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Form extends BaseData {
 	private int id;
 	private String name;
 	private FormRepos formRepos;
 	private User capturedBy;
+	private List<FormData> dataList;
 
-	public Form(String name, FormRepos formRepos, User capturedBy) {
+	public Form(int id, String name, FormRepos formRepos, User capturedBy) {
 		super();
 		this.name = name;
 		this.formRepos = formRepos;
 		this.capturedBy = capturedBy;
+		this.dataList = new LinkedList<>();
+		this.id = id;
 	}
 
 	public int getId() {
@@ -43,6 +49,14 @@ public class Form extends BaseData {
 
 	public void setCapturedBy(User capturedBy) {
 		this.capturedBy = capturedBy;
+	}
+
+	public List<FormData> getDataList() {
+		return dataList;
+	}
+
+	public void setDataList(List<FormData> dataList) {
+		this.dataList = dataList;
 	}
 
 }

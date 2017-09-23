@@ -1,14 +1,4 @@
 'use strict'
-function doAnimate(x) {
-	$('#mainview')
-			.removeClass(x)
-			.addClass(' ' + x)
-			.one(
-					'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend',
-					function() {
-						$(this).removeClass(x);
-					});
-};
 $(document).ready(
 		function() {
 
@@ -22,12 +12,12 @@ $(document).ready(
 			$('.nav-sidebar .nav li a[data-href="' + frag + '"]').parent()
 					.addClass('active');
 			var style = 'zoomIn';
-			doAnimate(style);
+			//doAnimate(style);
 
 			$(".nav-sidebar .nav li a").on("click", function() {
 				$(".nav-sidebar .nav").find("li.active").removeClass("active");
 				$(this).parent().addClass("active");
-				doAnimate(style);
+				//doAnimate(style);
 			});
 
 		});

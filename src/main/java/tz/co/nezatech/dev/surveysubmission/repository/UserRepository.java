@@ -33,7 +33,7 @@ public class UserRepository extends BaseDataRepository<User> {
 
 			@Override
 			public User mapRow(ResultSet rs, int i) throws SQLException {
-				User entity = new User(rs.getString("username"), null, rs.getString("email"),
+				User entity = new User(rs.getInt("id"), rs.getString("username"), null, rs.getString("email"),
 						new Role(rs.getInt("role_id"), rs.getString("role_name"), rs.getString("role_description")));
 				entity.setId(rs.getInt("id"));
 				return entity;

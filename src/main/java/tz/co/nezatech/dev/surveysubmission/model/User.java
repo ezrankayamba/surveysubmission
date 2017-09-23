@@ -17,12 +17,13 @@ public class User extends BaseData {
 		projects = new LinkedList<Project>();
 	}
 
-	public User(String username, String password, String email, Role role) {
+	public User(int id, String username, String password, String email, Role role) {
 		this();
 		this.username = username;
 		this.password = password;
 		this.email = email;
 		this.role = role;
+		this.id = id;
 	}
 
 	public List<Project> getProjects() {
