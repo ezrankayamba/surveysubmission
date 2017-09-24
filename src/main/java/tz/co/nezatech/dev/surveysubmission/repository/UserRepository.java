@@ -48,7 +48,7 @@ public class UserRepository extends BaseDataRepository<User> {
 
 	@Override
 	public String sqlFindById() {
-		return "select u.*, r.name as role_name, r.description as role_description from tbl_user u left join tbl_role r on u.role_id=r.id where u.id = ?";
+		return sqlFindAll() + " where u.id = ?";
 	}
 
 	@Override

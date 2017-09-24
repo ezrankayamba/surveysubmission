@@ -34,9 +34,10 @@ public class FormRepository extends BaseDataRepository<Form> {
 
 			@Override
 			public Form mapRow(ResultSet rs, int i) throws SQLException {
-				Form entity = new Form(rs.getInt("id"), rs.getString("name"),
-						new FormRepos(rs.getString("repos_name"), rs.getString("repos_description"),
-								rs.getString("repos_filepath"),
+				Form entity = new Form(rs.getInt("id"), rs.getString("repos_path"), rs.getString("repos_version"),
+						rs.getString("name"),
+						new FormRepos(rs.getString("version"), rs.getString("repos_name"),
+								rs.getString("repos_description"), rs.getString("repos_filepath"),
 								new Project(rs.getInt("project_id"), rs.getString("proj_name"),
 										rs.getString("proj_status"))),
 						new User(rs.getInt("user_id"), rs.getString("username"), null, rs.getString("email"), null));
@@ -49,7 +50,7 @@ public class FormRepository extends BaseDataRepository<Form> {
 	@Override
 	public String sqlFindAll() {
 		return "select fm.*, fr.name as repos_name, "
-				+ "fr.description as repos_description, fr.filepath as repos_filepath, fr.project_id, "
+				+ "fr.description as repos_description, fr.filepath as repos_filepath, fr.project_id, fr.version as version, "
 				+ "pr.name as proj_name, pr.status as proj_status," + " u.id as user_id, u.username, u.email  "
 				+ "from tbl_form fm " + "left join tbl_form_repository fr on fm.repository_id=fr.id "
 				+ "left join tbl_project pr on fr.project_id=pr.id " + "left join tbl_user u on fm.user_id=u.id ";
@@ -57,23 +58,21 @@ public class FormRepository extends BaseDataRepository<Form> {
 
 	@Override
 	public String sqlFindById() {
-		return "select fm.*, fr.name as repos_name, "
-				+ "fr.description as repos_description, fr.filepath as repos_filepath, fr.project_id, "
-				+ "pr.name as proj_name, pr.status as proj_status," + " u.id as user_id, u.username, u.email "
-				+ "from tbl_form fm " + "left join tbl_form_repository fr on fm.repository_id=fr.id "
-				+ "left join tbl_project pr on fr.project_id=pr.id "
-				+ "left join tbl_user u on fm.user_id=u.id where fm.id=? ";
+		return sqlFindAll() + " where fm.id=? ";
 	}
 
 	@Override
 	public PreparedStatement psCreate(Form entity, Connection conn) {
 		PreparedStatement ps = null;
 		try {
-			ps = conn.prepareStatement("insert into tbl_form(name, repository_id,user_id) values (?,?,?)",
+			ps = conn.prepareStatement(
+					"insert into tbl_form(name, repository_id,user_id, repos_version, repos_path) values (?,?,?,?,?)",
 					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, entity.getName());
 			ps.setInt(2, entity.getFormRepos().getId());
 			ps.setInt(3, entity.getCapturedBy().getId());
+			ps.setString(4, entity.getReposVersion());
+			ps.setString(5, entity.getReposPath());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -131,8 +130,9 @@ public class FormRepository extends BaseDataRepository<Form> {
 
 							@Override
 							public void processRow(ResultSet rs) throws SQLException {
-								FormData data = new FormData(rs.getInt("id"), rs.getString("metadata"),
-										rs.getString("rawvalue"), rs.getString("datatype"), null);
+								FormData data = new FormData(rs.getInt("id"), rs.getString("category"),
+										rs.getString("type"), rs.getString("name"), rs.getString("metadata"),
+										rs.getString("rawvalue"), null);
 								data.setId(rs.getInt("id"));
 								entity.getDataList().add(data);
 							}

@@ -9,14 +9,26 @@ public class Form extends BaseData {
 	private FormRepos formRepos;
 	private User capturedBy;
 	private List<FormData> dataList;
+	private String reposVersion;
+	private String reposPath;
 
-	public Form(int id, String name, FormRepos formRepos, User capturedBy) {
+	public Form(int id, String reposPath, String reposVersion, String name, FormRepos formRepos, User capturedBy) {
 		super();
 		this.name = name;
 		this.formRepos = formRepos;
 		this.capturedBy = capturedBy;
 		this.dataList = new LinkedList<>();
 		this.id = id;
+		this.reposVersion = reposVersion;
+		this.reposPath = reposPath;
+	}
+
+	public String getReposPath() {
+		return reposPath;
+	}
+
+	public void setReposPath(String reposPath) {
+		this.reposPath = reposPath;
 	}
 
 	public int getId() {
@@ -25,6 +37,18 @@ public class Form extends BaseData {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getReposVersion() {
+		return reposVersion;
+	}
+
+	public void setReposVersion(String reposVersion) {
+		this.reposVersion = reposVersion;
+	}
+
+	public void setFormRepos(FormRepos formRepos) {
+		this.formRepos = formRepos;
 	}
 
 	public String getName() {

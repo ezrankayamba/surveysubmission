@@ -4,17 +4,27 @@ public class FormRepos extends BaseData {
 	private int id;
 	private String name, description, filepath;
 	private Project project;
+	private String version;
 
 	public FormRepos() {
 		super();
 	}
 
-	public FormRepos(String name, String description, String filepath, Project project) {
+	public FormRepos(String version, String name, String description, String filepath, Project project) {
 		super();
 		this.name = name;
 		this.description = description;
 		this.filepath = filepath;
 		this.project = project;
+		this.version=version; 
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
 	}
 
 	public int getId() {

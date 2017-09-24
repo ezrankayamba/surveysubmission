@@ -17,7 +17,11 @@
 		</tr>
 		<tr>
 			<td class="col-sm-2">File path:</td>
-			<td class="col-sm-10">{{entity.filepath}}</td>
+			<td class="col-sm-10">{{entity.filepath}} <br/><a class="download" data-ng-href="/survey/repos/{{entity.id}}"><img alt="" src="/img/download_icon.png"/> Download</a></td>
+		</tr>
+		<tr>
+			<td class="col-sm-2">Version:</td>
+			<td class="col-sm-10">{{entity.version}}</td>
 		</tr>
 		<tr>
 			<td colspan="2" class="bottom-controls">

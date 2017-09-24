@@ -414,3 +414,17 @@ table#formdatalist>tbody>tr.group{
 table#formdatalist>tbody>tr {
 	padding-left: 15px;
 }
+
+
+a.download{
+	border: 1px solid #33FF33;
+	display: inline-block;
+	padding: 4px;
+	text-decoration: none;
+	border-radius: 3px;
+}
+a.download img{
+	width: 20px;
+	height: 18px;
+	padding: 0px 4px 0px 0px;
+}

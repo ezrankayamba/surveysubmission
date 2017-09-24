@@ -43,7 +43,7 @@ public class ProjectRepository extends BaseDataRepository<Project> {
 
 	@Override
 	public String sqlFindById() {
-		return "select pr.* from tbl_project pr where pr.id = ?";
+		return sqlFindAll() + " where pr.id = ?";
 	}
 
 	@Override

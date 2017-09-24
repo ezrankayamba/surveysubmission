@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS `survey`.`tbl_form_repository` (
   `project_id` INT NOT NULL,
   `status` VARCHAR(45) NULL DEFAULT 'ACTIVE',
   `last_update` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `version` VARCHAR(45) NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_tbl_form_repository_tbl_project1`
     FOREIGN KEY (`project_id`)
@@ -110,6 +111,7 @@ CREATE TABLE IF NOT EXISTS `survey`.`tbl_form` (
   `user_id` INT NOT NULL,
   `status` VARCHAR(45) NULL DEFAULT 'ACTIVE',
   `last_update` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `repos_version` VARCHAR(45) NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_tbl_form_tbl_form_repository1`
     FOREIGN KEY (`repository_id`)

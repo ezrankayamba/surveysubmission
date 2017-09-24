@@ -20,6 +20,14 @@
 			<td class="col-sm-10">{{entity.capturedBy.username}}</td>
 		</tr>
 		<tr>
+			<td class="col-sm-2">Repos Version:</td>
+			<td class="col-sm-10">{{entity.reposVersion}}</td>
+		</tr>
+		<tr>
+			<td class="col-sm-2">Repos Path:</td>
+			<td class="col-sm-10">{{entity.reposPath}}<br/><a class="download" data-ng-href="/survey/reposv/{{entity.id}}"><img alt="" src="/img/download_icon.png"/>Download</a></td>
+		</tr>
+		<tr>
 			<td colspan="2">
 				<table id="formdatalist">
 					<caption>Form data fields</caption>
@@ -29,19 +37,22 @@
 						<th>Type</th>
 					</tr>
 					<tr data-ng-repeat="data in entity.dataList"
-						data-ng-class="{GRP:'group', '':'input'}[data.datatype]">
-						<td>{{data.metadata}}</td>
-						<td>{{data.rawvalue}}
-							<div data-ng-if="data.datatype == 'INPVID'">
-								<video width="320" height="240" controls>
-									<source data-ng-src="/survey/media/{{data.id}}" type="video/mp4" />
-								</video>
-							</div>
-							<div data-ng-if="data.datatype == 'INPPIC'">
-								<img data-ng-src="/survey/media/{{data.id}}" alt="" height="240" width="320"/>
+						data-ng-class="{GRP:'group', '':'input'}[data.category]">
+						<td>{{data.name}}</td>
+						<td>
+							<div data-ng-if="data.category != 'GRP'">
+								{{data.rawvalue}}
+								<div data-ng-if="data.category == 'INPVID'">
+									<video width="320" height="240" controls>
+										<source data-ng-src="/survey/media/{{data.id}}" type="video/mp4" />
+									</video>
+								</div>
+								<div data-ng-if="data.category == 'INPPIC'">
+									<img data-ng-src="/survey/media/{{data.id}}" alt="" height="240" width="320"/>
+								</div> 
 							</div>
 						</td>
-						<td>{{data.datatype}}</td>
+						<td>{{data.type}}</td>
 					</tr>
 				</table>
 			</td>

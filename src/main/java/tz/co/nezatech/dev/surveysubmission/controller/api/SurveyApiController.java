@@ -58,6 +58,7 @@ import tz.co.nezatech.dev.surveysubmission.repository.FormRepository;
 import tz.co.nezatech.dev.surveysubmission.repository.ProjectRepository;
 import tz.co.nezatech.dev.surveysubmission.repository.UserRepository;
 import tz.co.nezatech.dev.surveysubmission.storage.StorageService;
+import tz.co.nezatech.dev.surveysubmission.util.RegexUtil;
 
 @Controller
 @RestController
@@ -73,6 +74,8 @@ public class SurveyApiController {
 	private String pictures;
 	@Value("${survey.form.files.upload.folder.other}")
 	private String others;
+	@Value("${survey.form.repos.version.regex}")
+	private String versionRegex;
 	@Autowired
 	StorageService storageService;
 	@Autowired
@@ -104,12 +107,15 @@ public class SurveyApiController {
 			String formIdStr = request.getParameter("form_id");
 			String formNameStr = request.getParameter("form_name");
 			String reposIdStr = request.getParameter("repository_id");
+			String reposPath = request.getParameter("repos_path");
+			String reposVersion = RegexUtil.value(reposPath, versionRegex);
 
 			LOG.debug(String.format("FormId: %s, FormName: %s, ReposId: %s, Captured By: %s", formIdStr, formNameStr,
 					reposIdStr, capturedBy.getUsername()));
-			Form form = new Form(0, formNameStr, reposRepository.findById(Integer.parseInt(reposIdStr)), capturedBy);
+			Form form = new Form(0, reposPath, reposVersion, formNameStr,
+					reposRepository.findById(Integer.parseInt(reposIdStr)), capturedBy);
 			Status fStatus = formRepository.create(form);
-			String[] excludes = { "form_id", "form_name", "repository_id" };
+			String[] excludes = { "form_id", "form_name", "repository_id", "repos_path" };
 			form = formRepository.findById(fStatus.getGeneratedId());
 
 			String formFolder = String.format("%08d/", capturedBy.getId()) + String.format("%05d/", form.getId());
@@ -122,9 +128,9 @@ public class SurveyApiController {
 					Part part = (Part) iterator.next();
 
 					String contentType = part.getContentType();
-					String name = part.getName();
+					String partName = part.getName();
 
-					if (Arrays.asList(excludes).contains(name)) {
+					if (Arrays.asList(excludes).contains(partName)) {
 						continue;
 					}
 
@@ -132,7 +138,7 @@ public class SurveyApiController {
 					if (contentType.startsWith("text/plain")) {
 						rawValue = IOUtils.toString(part.getInputStream(), "UTF-8");
 					} else {
-						MultipartFile file = request.getFile(name);
+						MultipartFile file = request.getFile(partName);
 						if (file != null) {
 							rawValue = file.getOriginalFilename();
 						} else {
@@ -140,9 +146,10 @@ public class SurveyApiController {
 						}
 					}
 
-					LOG.debug(String.format("Type: %s, Name: %s, Value: %s", contentType, name, rawValue));
+					LOG.debug(String.format("Type: %s, Name: %s, Value: %s", contentType, partName, rawValue));
+					String[] tokens = partName.split(":");
 
-					FormData data = new FormData(0, name, rawValue, name.split(":")[0], form);
+					FormData data = new FormData(0, tokens[0], tokens[1], tokens[2], partName, rawValue, form);
 					formDataRepository.create(data);
 
 				} catch (Exception e) {
@@ -226,7 +233,18 @@ public class SurveyApiController {
 		FormRepos formRepos = reposRepository.findById(id);
 		Resource file = storageService.loadAsResource(formRepos.getFilepath());
 		return ResponseEntity.ok()
-				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + formRepos.getFilepath() + "\"")
+				.body(file);
+	}
+	
+	@RequestMapping(value = "/reposv/{id}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Resource> getReposFileV(@AuthenticationPrincipal UserDetails user, @PathVariable("id") int id,
+			HttpServletResponse response) {
+		Form form = formRepository.findById(id);
+		Resource file = storageService.loadAsResource(form.getReposPath());
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + form.getReposPath() + "\"")
 				.body(file);
 	}
 
@@ -236,7 +254,7 @@ public class SurveyApiController {
 		Form f = fd.getForm();
 		int formId = f.getId();
 		int capturedBy = f.getCapturedBy().getId();
-		String mediaType = fd.getDatatype().equals("INPVID") ? "videos" : "pictures";
+		String mediaType = fd.getCategory().equals("INPVID") ? "videos" : "pictures";
 		String fileName = fd.getRawvalue();
 		String formFolder = String.format("%08d/", capturedBy) + String.format("%05d/", formId);
 		String fullPath = uploadPath + formFolder + mediaType + "/" + fileName;
@@ -251,140 +269,138 @@ public class SurveyApiController {
 		return responseEntity;
 	}
 
-	@RequestMapping(value = "/zip/{formId}", method = RequestMethod.GET, produces={"application/zip"})
-	public ResponseEntity<byte[]> getZipedForm(@PathVariable("formId") int formId, HttpServletResponse response ) throws IOException {
-		Form form=formRepository.findById(formId);
+	@RequestMapping(value = "/zip/{formId}", method = RequestMethod.GET, produces = { "application/zip" })
+	public ResponseEntity<byte[]> getZipedForm(@PathVariable("formId") int formId, HttpServletResponse response)
+			throws IOException {
+		Form form = formRepository.findById(formId);
 		List<FormData> formDataList = form.getDataList();
 		try {
-            HSSFWorkbook workbook = new HSSFWorkbook();
-            HSSFSheet formSheet =workbook.createSheet("Form");
-            HSSFRow row1 = formSheet.createRow((short)0);
-            row1.createCell(0).setCellValue("PROJECT");
-            row1.createCell(1).setCellValue(form.getFormRepos().getProject().getName());
-            
-            HSSFRow row2 = formSheet.createRow((short)1);
-            row2.createCell(0).setCellValue("REPOSITORY");
-            row2.createCell(1).setCellValue(form.getFormRepos().getName());
-            
-            HSSFRow row3 = formSheet.createRow((short)2); 
-            row3.createCell(0).setCellValue("FORM NAME");
-            row3.createCell(1).setCellValue(form.getName());
-            
-            HSSFRow row4 = formSheet.createRow((short)3);
-            row4.createCell(0).setCellValue("CAPTURED BY");
-            row4.createCell(1).setCellValue(form.getCapturedBy().getUsername());
-  
-            
-            HSSFSheet sheet = workbook.createSheet("Form Data");  
+			HSSFWorkbook workbook = new HSSFWorkbook();
+			HSSFSheet formSheet = workbook.createSheet("Form");
+			HSSFRow row1 = formSheet.createRow((short) 0);
+			row1.createCell(0).setCellValue("PROJECT");
+			row1.createCell(1).setCellValue(form.getFormRepos().getProject().getName());
 
-            HSSFRow rowhead = sheet.createRow((short)0);
-            rowhead.createCell(0).setCellValue("ID");
-            rowhead.createCell(1).setCellValue("NAME");
-            rowhead.createCell(2).setCellValue("VALUE");
-            rowhead.createCell(3).setCellValue("TYPE");
-            
-            Map<String, String> mediaFiles=new LinkedHashMap<>();
+			HSSFRow row2 = formSheet.createRow((short) 1);
+			row2.createCell(0).setCellValue("REPOSITORY");
+			row2.createCell(1).setCellValue(form.getFormRepos().getName());
 
-            int i=1;
-            for (Iterator<FormData> iterator = formDataList.iterator(); iterator.hasNext();) {
+			HSSFRow row3 = formSheet.createRow((short) 2);
+			row3.createCell(0).setCellValue("FORM NAME");
+			row3.createCell(1).setCellValue(form.getName());
+
+			HSSFRow row4 = formSheet.createRow((short) 3);
+			row4.createCell(0).setCellValue("CAPTURED BY");
+			row4.createCell(1).setCellValue(form.getCapturedBy().getUsername());
+
+			HSSFSheet sheet = workbook.createSheet("Form Data");
+
+			HSSFRow rowhead = sheet.createRow((short) 0);
+			rowhead.createCell(0).setCellValue("ID");
+			rowhead.createCell(1).setCellValue("NAME");
+			rowhead.createCell(2).setCellValue("VALUE");
+			rowhead.createCell(3).setCellValue("TYPE");
+
+			Map<String, String> mediaFiles = new LinkedHashMap<>();
+
+			int i = 1;
+			for (Iterator<FormData> iterator = formDataList.iterator(); iterator.hasNext();) {
 				FormData formData = (FormData) iterator.next();
-				HSSFRow row = sheet.createRow((short)(i++));
-	            row.createCell(0).setCellValue(formData.getId());
-	            row.createCell(1).setCellValue(formData.getMetadata());
-	            row.createCell(2).setCellValue(formData.getRawvalue());
-	            row.createCell(3).setCellValue(formData.getDatatype() );
-	            
-	            if(formData.getDatatype().equals("INPPIC")) {
-	            	mediaFiles.put(formData.getRawvalue(), "pictures");
-	            }else if(formData.getDatatype().equals("INPVID")) {
-	            	mediaFiles.put(formData.getRawvalue(), "videos");
-	            }
+				HSSFRow row = sheet.createRow((short) (i++));
+				row.createCell(0).setCellValue(formData.getId());
+				row.createCell(1).setCellValue(formData.getName());
+				row.createCell(2).setCellValue(formData.getRawvalue());
+				row.createCell(3).setCellValue(formData.getType());
+
+				if (formData.getCategory().equals("INPPIC")) {
+					mediaFiles.put(formData.getRawvalue(), "pictures");
+				} else if (formData.getCategory().equals("INPVID")) {
+					mediaFiles.put(formData.getRawvalue(), "videos");
+				}
 			}
-            String fname=formId+"-excel";
-            File temp = File.createTempFile(fname , ".xslx");   
-            FileOutputStream fileOut = new FileOutputStream(temp );
-            workbook.write(fileOut); 
-            fileOut.close();
-            System.out.println("Your excel file has been generated!");
-            
-            workbook.close(); 
-            
-            File zipFile = File.createTempFile(form.getName() , ".zip"); 
-            zipIt(zipFile, mediaFiles, form.getCapturedBy().getId(), formId, temp);
-            
-            
-            Path path = Paths.get(zipFile.getAbsolutePath());
-    		HttpHeaders headers = new HttpHeaders();
-    		byte[] media = Files.readAllBytes(path);
-    		headers.setCacheControl(CacheControl.noCache().getHeaderValue());
-    	    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-    	    response.setHeader("Content-Disposition", "attachment; filename=" + form.getFormRepos().getName()+"-"+form.getId()+".zip");
+			String fname = formId + "-excel";
+			File temp = File.createTempFile(fname, ".xslx");
+			FileOutputStream fileOut = new FileOutputStream(temp);
+			workbook.write(fileOut);
+			fileOut.close();
+			System.out.println("Your excel file has been generated!");
 
-    		ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
-    		return responseEntity;
+			workbook.close();
 
-        } catch ( Exception ex ) {
-            System.out.println(ex);
-        }
+			File zipFile = File.createTempFile(form.getName(), ".zip");
+			zipIt(zipFile, mediaFiles, form.getCapturedBy().getId(), formId, temp);
+
+			Path path = Paths.get(zipFile.getAbsolutePath());
+			HttpHeaders headers = new HttpHeaders();
+			byte[] media = Files.readAllBytes(path);
+			headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+			response.setHeader("Content-Disposition",
+					"attachment; filename=" + form.getFormRepos().getName() + "-" + form.getId() + ".zip");
+
+			ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
+			return responseEntity;
+
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
 		return null;
 	}
-	
-	private void zipIt(File zipFile, Map<String, String> files, int capturedBy, int formId, File excel){
-		
+
+	private void zipIt(File zipFile, Map<String, String> files, int capturedBy, int formId, File excel) {
+
 		String formFolder = String.format("%08d/", capturedBy) + String.format("%05d/", formId);
-		
 
-	     byte[] buffer = new byte[1024];
+		byte[] buffer = new byte[1024];
 
-	     try{
+		try {
 
-	    	FileOutputStream fos = new FileOutputStream(zipFile);
-	    	ZipOutputStream zos = new ZipOutputStream(fos);
+			FileOutputStream fos = new FileOutputStream(zipFile);
+			ZipOutputStream zos = new ZipOutputStream(fos);
 
-	    	System.out.println("Output to Zip : " + zipFile);
+			System.out.println("Output to Zip : " + zipFile);
 
-	    	for(String key : files.keySet()){
-	    		
-	    		String fullPath = uploadPath + formFolder + files.get(key)+"/"+key;
-	    		LOG.debug(fullPath);
+			for (String key : files.keySet()) {
 
-	    		System.out.println("File Added : " + key);
-	    		ZipEntry ze= new ZipEntry(key);
-	        	zos.putNextEntry(ze);
+				String fullPath = uploadPath + formFolder + files.get(key) + "/" + key;
+				LOG.debug(fullPath);
 
-	        	FileInputStream in = new FileInputStream(fullPath);
- 
-	        	int len;
-	        	while ((len = in.read(buffer)) > 0) {
-	        		zos.write(buffer, 0, len);
-	        	}
+				System.out.println("File Added : " + key);
+				ZipEntry ze = new ZipEntry(key);
+				zos.putNextEntry(ze);
 
-	        	in.close();
-	    	}
-	    	
-	    	{
-	    		ZipEntry ze= new ZipEntry(excel.getName());
-	        	zos.putNextEntry(ze);
+				FileInputStream in = new FileInputStream(fullPath);
 
-	        	FileInputStream in = new FileInputStream(excel);
- 
-	        	int len;
-	        	while ((len = in.read(buffer)) > 0) {
-	        		zos.write(buffer, 0, len);
-	        	}
+				int len;
+				while ((len = in.read(buffer)) > 0) {
+					zos.write(buffer, 0, len);
+				}
 
-	        	in.close();
-	    	}
+				in.close();
+			}
 
-	    	zos.closeEntry();
-	    	//remember close it
-	    	zos.close();
+			{
+				ZipEntry ze = new ZipEntry(excel.getName());
+				zos.putNextEntry(ze);
 
-	    	System.out.println("Done");
-	    }catch(IOException ex){
-	       ex.printStackTrace();
-	    }
-	   }
+				FileInputStream in = new FileInputStream(excel);
 
+				int len;
+				while ((len = in.read(buffer)) > 0) {
+					zos.write(buffer, 0, len);
+				}
+
+				in.close();
+			}
+
+			zos.closeEntry();
+			// remember close it
+			zos.close();
+
+			System.out.println("Done");
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
 
 }

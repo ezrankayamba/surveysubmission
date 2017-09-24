@@ -2,16 +2,44 @@ package tz.co.nezatech.dev.surveysubmission.model;
 
 public class FormData extends BaseData {
 	private int id;
-	private String metadata, rawvalue, datatype;
+	private String metadata, rawvalue;
+	private String category, type, name;
 	private Form form;
 
-	public FormData(int id, String metadata, String rawdata, String datatype, Form form) {
+	public FormData(int id, String category, String type, String name, String metadata, String rawdata,
+			Form form) {
 		super();
 		this.metadata = metadata;
 		this.rawvalue = rawdata;
-		this.datatype = datatype;
 		this.form = form;
 		this.id = id;
+		this.category = category;
+		this.type = type;
+		this.name = name;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public int getId() {
@@ -38,13 +66,6 @@ public class FormData extends BaseData {
 		this.rawvalue = rawdata;
 	}
 
-	public String getDatatype() {
-		return datatype;
-	}
-
-	public void setDatatype(String datatype) {
-		this.datatype = datatype;
-	}
 
 	public Form getForm() {
 		return form;

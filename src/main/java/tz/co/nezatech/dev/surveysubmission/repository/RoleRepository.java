@@ -39,7 +39,7 @@ public class RoleRepository extends BaseDataRepository<Role> {
 
 	@Override
 	public String sqlFindById() {
-		return "select r.* from tbl_role r where r.id = ?";
+		return sqlFindAll() + " where r.id = ?";
 	}
 
 	@Override
